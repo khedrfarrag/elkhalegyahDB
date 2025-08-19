@@ -1,0 +1,39 @@
+
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      SA_PASSWORD: "SSSherifeleraky123!@#"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "9500:1433"
+    volumes:
+      - sqlserver_data:/var/opt/sqllserver
+    networks:
+      - backend
+
+  alkhaligya.api:
+    image: myapp2
+    ports:
+      - "8082:80"
+      - "8083:443"
+    depends_on:
+      - sqlserver
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=sqlserver;Database=AlkhaligyaDB;User Id=sa;Password=SSSherifeleraky123!@#;TrustServerCertificate=True;Encrypt=False;
+      - ASPNETCORE_ENVIRONMENT=Development
+      - CORS__AllowedOrigins=http://localhost:8080,https://localhost:8081,http://localhost
+    volumes:
+      - ./Alkhaligya/https:/https
+      - ./Alkhaligya/wwwroot/images:/app/wwwroot/images
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
+    driver: local
